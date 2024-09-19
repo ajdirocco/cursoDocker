@@ -1,0 +1,31 @@
+services:
+    mysql:
+        networks:
+            net-todo:
+                aliases:
+                    - mysql
+        volumes:
+            - sql_data:/var/lib/mysql
+        environment:
+            - MYSQL_ROOT_PASSWORD=holapass
+            - MYSQL_DATABASE=todo
+        image: mysql:8.0
+    practica:
+        ports:
+            - 3000:3000
+        networks:
+            - net-todo
+        environment:
+            - MYSQL_HOST=mysql
+            - MYSQL_USER=root
+            - MYSQL_PASSWORD=holapass
+            - MYSQL_DB=todo
+        image: ajdirocco/practica:7.0
+networks:
+    net-todo:
+        external: true
+        name: net-todo
+volumes:
+    sql_data:
+        external: true
+        name: sql_data
