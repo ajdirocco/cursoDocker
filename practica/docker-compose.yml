@@ -1,29 +1,42 @@
+version: '3.8'
+
 services:
-    mysql:
-        networks:
-            net-todo:
-                aliases:
-                    - mysql
-        volumes:
-            - sql_data:/var/lib/mysql
-        environment:
-            - MYSQL_ROOT_PASSWORD=holapass
-            - MYSQL_DATABASE=todo
-        image: mysql:8.0
-    practica:
-        ports:
-            - 3000:3000
-        networks:
-            - net-todo
-        environment:
-            - MYSQL_HOST=mysql
-            - MYSQL_USER=root
-            - MYSQL_PASSWORD=holapass
-            - MYSQL_DB=todo
-        image: ajdirocco/practica:7.0
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+        - MYSQL_ROOT_PASSWORD=holapass
+        - MYSQL_DATABASE=todo
+    volumes:
+      - sql_data:/var/lib/mysql
+    networks:
+      - net-todo
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 5s
+
+  app:
+    image: ajdirocco/practica:7.0
+    container_name: todo-app
+    ports:
+      - "3000:3000"
+    environment:
+        - MYSQL_HOST=mysql
+        - MYSQL_USER=root
+        - MYSQL_PASSWORD=holapass
+        - MYSQL_DB=todo
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - net-todo
+
 networks:
-    net-todo:
-        name: net-todo
+  net-todo:
+
 volumes:
-    sql_data:
-        name: sql_data
+  sql_data:
+    name: sql_data
