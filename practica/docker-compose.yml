@@ -23,9 +23,7 @@ services:
         image: ajdirocco/practica:7.0
 networks:
     net-todo:
-        external: true
         name: net-todo
 volumes:
     sql_data:
-        external: true
         name: sql_data
